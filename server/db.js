@@ -87,6 +87,15 @@ function initDb() {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`);
 
+        // Reviews Table
+        db.run(`CREATE TABLE IF NOT EXISTS reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_name TEXT,
+            rating INTEGER,
+            comment TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )`);
+
         // Always seed to ensure the latest data from this file is used
         console.log("Updating Database Content...");
         seedData();
@@ -194,6 +203,21 @@ function seedData() {
     const stmtDemos = db.prepare("INSERT INTO demos (title, url, poster) VALUES (?, ?, ?)");
     demos.forEach(d => stmtDemos.run(d));
     stmtDemos.finalize();
+
+    // Check if reviews exist, if not seed some
+    db.get("SELECT count(*) as count FROM reviews", [], (err, row) => {
+        if (err) return;
+        if (row.count === 0) {
+            const reviews = [
+                ["Amit Patel", 5, "Amazing platform! learned so much about AI video tools."],
+                ["Priya Singh", 4, "Great content, waiting for more advanced modules."],
+                ["Rahul Kumar", 5, "Best place to learn AI in Hindi."]
+            ];
+            const stmtReviews = db.prepare("INSERT INTO reviews (user_name, rating, comment) VALUES (?, ?, ?)");
+            reviews.forEach(r => stmtReviews.run(r));
+            stmtReviews.finalize();
+        }
+    });
 
     console.log("Database seeded successfully.");
 }

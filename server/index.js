@@ -36,7 +36,7 @@ app.get('/api/features', (req, res) => {
     });
 });
 
-// Get testmonials
+// Get testmonials (Curated)
 app.get('/api/testimonials', (req, res) => {
     db.all("SELECT * FROM testimonials", [], (err, rows) => {
         if (err) {
@@ -44,6 +44,34 @@ app.get('/api/testimonials', (req, res) => {
             return;
         }
         res.json(rows);
+    });
+});
+
+// Get user reviews (Dynamic)
+app.get('/api/reviews', (req, res) => {
+    db.all("SELECT * FROM reviews ORDER BY created_at DESC", [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// Post a new review
+app.post('/api/reviews', (req, res) => {
+    const { user_name, rating, comment } = req.body;
+    if (!user_name || !rating || !comment) {
+        return res.status(400).json({ error: 'Name, rating, and comment are required' });
+    }
+
+    const sql = 'INSERT INTO reviews (user_name, rating, comment) VALUES (?, ?, ?)';
+    db.run(sql, [user_name, rating, comment], function (err) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({ id: this.lastID, user_name, rating, comment, created_at: new Date() });
     });
 });
 

@@ -3,6 +3,7 @@ import { Play, CheckCircle, Star, Menu, X, ChevronRight, Award, Users, TrendingU
 import AuthModal from './components/modals/AuthModal';
 import EnrollmentModal from './components/modals/EnrollmentModal';
 import VideoGalleryModal from './components/modals/VideoGalleryModal';
+import ReviewModal from './components/modals/ReviewModal';
 import ImageGeneration from './components/pages/ImageGeneration';
 import VideoTools from './components/pages/VideoTools';
 import AIPrompting from './components/pages/AIPrompting';
@@ -19,12 +20,14 @@ export default function AIVideoSchool() {
     const [authModal, setAuthModal] = useState({ isOpen: false, view: 'signin' });
     const [enrollModal, setEnrollModal] = useState({ isOpen: false, plan: null, course: null });
     const [showVideoGallery, setShowVideoGallery] = useState(false);
+    const [showReviewModal, setShowReviewModal] = useState(false);
     const [policyModal, setPolicyModal] = useState({ show: false, title: '', content: '' });
 
     // Data States
     const [courses, setCourses] = useState([]);
     const [features, setFeatures] = useState([]);
     const [testimonials, setTestimonials] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [pricingPlans, setPricingPlans] = useState([]);
     const [stats, setStats] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -49,20 +52,22 @@ export default function AIVideoSchool() {
             try {
                 const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
                 const apiBase = `${baseUrl}/api`;
-                const [coursesRes, featuresRes, testimonialsRes, statsRes, plansRes] = await Promise.all([
+                const [coursesRes, featuresRes, testimonialsRes, statsRes, plansRes, reviewsRes] = await Promise.all([
                     fetch(`${apiBase}/courses`),
                     fetch(`${apiBase}/features`),
                     fetch(`${apiBase}/testimonials`),
                     fetch(`${apiBase}/stats`),
-                    fetch(`${apiBase}/plans`)
+                    fetch(`${apiBase}/plans`),
+                    fetch(`${apiBase}/reviews`)
                 ]);
 
-                const [coursesData, featuresData, testimonialsData, statsData, plansData] = await Promise.all([
+                const [coursesData, featuresData, testimonialsData, statsData, plansData, reviewsData] = await Promise.all([
                     coursesRes.json(),
                     featuresRes.json(),
                     testimonialsRes.json(),
                     statsRes.json(),
-                    plansRes.json()
+                    plansRes.json(),
+                    reviewsRes.json()
                 ]);
 
                 setCourses(coursesData);
@@ -70,6 +75,7 @@ export default function AIVideoSchool() {
                 setTestimonials(testimonialsData);
                 setStats(statsData);
                 setPricingPlans(plansData);
+                setReviews(reviewsData);
                 setLoading(false);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -156,6 +162,13 @@ export default function AIVideoSchool() {
             <VideoGalleryModal
                 isOpen={showVideoGallery}
                 onClose={() => setShowVideoGallery(false)}
+            />
+
+            <ReviewModal
+                isOpen={showReviewModal}
+                onClose={() => setShowReviewModal(false)}
+                user={user}
+                onReviewSubmit={(newReview) => setReviews([newReview, ...reviews])}
             />
 
             {/* Navigation */}
@@ -470,25 +483,46 @@ export default function AIVideoSchool() {
                         </div>
                     </section>
 
-                    {/* Testimonials */}
+                    {/* Testimonials & Reviews */}
                     <section id="testimonials" className="py-20 px-4 bg-slate-800/50">
                         <div className="max-w-7xl mx-auto">
-                            <h2 className="text-4xl font-bold text-center mb-4">हमारे Students क्या कहते हैं</h2>
-                            <p className="text-center text-gray-400 mb-12">भारत भर से सफलता की कहानियां</p>
+                            <div className="flex justify-between items-end mb-12 px-4">
+                                <div className="text-left">
+                                    <h2 className="text-4xl font-bold mb-4">Reviews & Success Stories</h2>
+                                    <p className="text-gray-400">Join thousands of satisfied learners</p>
+                                </div>
+                                <button
+                                    onClick={() => setShowReviewModal(true)}
+                                    className="px-6 py-2 bg-orange-600 hover:bg-orange-700 rounded-lg font-semibold transition flex items-center gap-2"
+                                >
+                                    <Star className="w-4 h-4" /> Write a Review
+                                </button>
+                            </div>
+
                             <div className="grid md:grid-cols-3 gap-8">
-                                {testimonials.map((testimonial, idx) => (
+                                {/* Display latest 3 reviews first, then testimonials */}
+                                {reviews.concat(testimonials).slice(0, 6).map((item, idx) => (
                                     <div key={idx} className="bg-gradient-to-br from-orange-900/30 to-green-900/30 p-6 rounded-xl border border-orange-500/20">
                                         <div className="flex gap-1 mb-4">
                                             {[...Array(5)].map((_, i) => (
-                                                <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                                                <Star
+                                                    key={i}
+                                                    className={`w-5 h-5 ${i < (item.rating || 5) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'}`}
+                                                />
                                             ))}
                                         </div>
-                                        <p className="text-gray-300 mb-6 italic">"{testimonial.text}"</p>
+                                        <p className="text-gray-300 mb-6 italic">"{item.comment || item.text}"</p>
                                         <div className="flex items-center gap-3">
-                                            <img src={testimonial.image} alt={testimonial.name} className="w-12 h-12 rounded-full" />
+                                            <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-xl font-bold text-orange-400 border border-orange-500/30">
+                                                {item.image ? (
+                                                    <img src={item.image} alt={item.user_name || item.name} className="w-full h-full rounded-full object-cover" />
+                                                ) : (
+                                                    (item.user_name || item.name || 'U').charAt(0).toUpperCase()
+                                                )}
+                                            </div>
                                             <div>
-                                                <div className="font-semibold">{testimonial.name}</div>
-                                                <div className="text-sm text-gray-400">{testimonial.role}</div>
+                                                <div className="font-semibold">{item.user_name || item.name}</div>
+                                                <div className="text-sm text-gray-400">{item.role || (item.created_at ? new Date(item.created_at).toLocaleDateString() : 'Student')}</div>
                                             </div>
                                         </div>
                                     </div>

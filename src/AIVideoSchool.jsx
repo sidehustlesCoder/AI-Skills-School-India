@@ -158,11 +158,6 @@ export default function AIVideoSchool() {
                 onClose={() => setShowVideoGallery(false)}
             />
 
-            {/* Top Banner */}
-            <div className="bg-gradient-to-r from-orange-600 to-green-600 text-white text-center py-2 text-sm z-50 relative">
-                🎉 Independence Day Special: 60% OFF on all plans! Offer ends soon | भारत के लिए विशेष छूट
-            </div>
-
             {/* Navigation */}
             <nav className="sticky top-0 w-full bg-slate-900/95 backdrop-blur-lg z-40 border-b border-purple-500/20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -506,8 +501,7 @@ export default function AIVideoSchool() {
                     <section id="pricing" className="py-20 px-4">
                         <div className="max-w-7xl mx-auto">
                             <h2 className="text-4xl font-bold text-center mb-4">अपना Plan चुनें</h2>
-                            <p className="text-center text-gray-400 mb-2">भारतीय छात्रों के लिए विशेष कीमतें</p>
-                            <p className="text-center text-orange-400 mb-12">🎊 Independence Day Special - 60% OFF on all plans!</p>
+                            <p className="text-center text-gray-400 mb-12">भारतीय छात्रों के लिए विशेष कीमतें</p>
 
                             <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                                 {pricingPlans.map((plan, idx) => (

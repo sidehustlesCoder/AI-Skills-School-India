@@ -689,7 +689,7 @@ export default function AIVideoSchool() {
                             </div>
                             <p className="text-gray-400 text-sm">भारतीय creators को AI video technology से सशक्त बनाना</p>
                             <div className="mt-4 text-sm text-gray-400">
-                                <p>📍 Offices: Mumbai, Delhi, Bangalore</p>
+
                                 <p>📞 Support: 1800-123-4567</p>
                                 <p>✉️ support@aivideoschool.in</p>
                             </div>

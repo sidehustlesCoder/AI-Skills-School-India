@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, CheckCircle, Star, Menu, X, ChevronRight, Award, Users, TrendingUp, BookOpen, Globe, IndianRupee } from 'lucide-react';
+import { Play, CheckCircle, Star, Menu, X, ChevronRight, ChevronLeft, Award, Users, TrendingUp, BookOpen, Globe, IndianRupee } from 'lucide-react';
 import AuthModal from './components/modals/AuthModal';
 import EnrollmentModal from './components/modals/EnrollmentModal';
 import VideoGalleryModal from './components/modals/VideoGalleryModal';
@@ -22,6 +22,24 @@ export default function AIVideoSchool() {
     const [showVideoGallery, setShowVideoGallery] = useState(false);
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [policyModal, setPolicyModal] = useState({ show: false, title: '', content: '' });
+
+    // Video Carousel State
+    const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+    const heroVideos = [
+        "tKv1RqoSoJA", // Original
+        "fQNjD1asFJI", // New 1
+        "-qvSZDWmO-4"  // New 2
+    ];
+
+    const nextVideo = (e) => {
+        e.stopPropagation();
+        setCurrentVideoIndex((prev) => (prev + 1) % heroVideos.length);
+    };
+
+    const prevVideo = (e) => {
+        e.stopPropagation();
+        setCurrentVideoIndex((prev) => (prev - 1 + heroVideos.length) % heroVideos.length);
+    };
 
 
     // Data States
@@ -367,7 +385,7 @@ export default function AIVideoSchool() {
                                 <div className="relative rounded-2xl overflow-hidden border-2 border-orange-500/30 shadow-2xl group-hover:border-orange-500/60 transition duration-300 aspect-video">
                                     <iframe
                                         className="w-full h-full pointer-events-none"
-                                        src="https://www.youtube.com/embed/tKv1RqoSoJA?autoplay=1&mute=1&loop=1&playlist=tKv1RqoSoJA&controls=0&showinfo=0&rel=0&modestbranding=1"
+                                        src={`https://www.youtube.com/embed/${heroVideos[currentVideoIndex]}?autoplay=1&mute=1&loop=1&playlist=${heroVideos[currentVideoIndex]}&controls=0&showinfo=0&rel=0&modestbranding=1`}
                                         title="Hero Video"
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -391,6 +409,30 @@ export default function AIVideoSchool() {
                                         <p className="text-white text-sm md:text-base font-medium">
                                             ✨ See how AI creates stunning videos from simple text prompts
                                         </p>
+                                    </div>
+
+                                    {/* Carousel Controls */}
+                                    <button
+                                        onClick={prevVideo}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition z-20"
+                                    >
+                                        <ChevronLeft className="w-8 h-8" />
+                                    </button>
+                                    <button
+                                        onClick={nextVideo}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition z-20"
+                                    >
+                                        <ChevronRight className="w-8 h-8" />
+                                    </button>
+
+                                    {/* Pagination Dots */}
+                                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                                        {heroVideos.map((_, idx) => (
+                                            <div
+                                                key={idx}
+                                                className={`w-2 h-2 rounded-full transition-all ${idx === currentVideoIndex ? 'bg-orange-500 w-6' : 'bg-white/50'}`}
+                                            />
+                                        ))}
                                     </div>
                                 </div>
                             </div>
@@ -739,7 +781,8 @@ export default function AIVideoSchool() {
                     </section>
 
                 </>
-            )}
+            )
+            }
 
             {/* Footer */}
             <footer className="bg-slate-900 py-12 px-4 border-t border-orange-500/20">
@@ -795,22 +838,24 @@ export default function AIVideoSchool() {
             </footer>
 
             {/* Policy Modal */}
-            {policyModal.show && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
-                    <div className="bg-slate-900 border border-orange-500/30 rounded-2xl max-w-2xl w-full p-8 relative">
-                        <button onClick={() => setPolicyModal({ ...policyModal, show: false })} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
-                            <X className="w-6 h-6" />
-                        </button>
-                        <h3 className="text-2xl font-bold mb-4 text-orange-500">{policyModal.title}</h3>
-                        <div className="text-gray-300 leading-relaxed mb-6 whitespace-pre-wrap">
-                            {policyModal.content}
+            {
+                policyModal.show && (
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                        <div className="bg-slate-900 border border-orange-500/30 rounded-2xl max-w-2xl w-full p-8 relative">
+                            <button onClick={() => setPolicyModal({ ...policyModal, show: false })} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                                <X className="w-6 h-6" />
+                            </button>
+                            <h3 className="text-2xl font-bold mb-4 text-orange-500">{policyModal.title}</h3>
+                            <div className="text-gray-300 leading-relaxed mb-6 whitespace-pre-wrap">
+                                {policyModal.content}
+                            </div>
+                            <button onClick={() => setPolicyModal({ ...policyModal, show: false })} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-lg border border-slate-600 transition">
+                                Close
+                            </button>
                         </div>
-                        <button onClick={() => setPolicyModal({ ...policyModal, show: false })} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-lg border border-slate-600 transition">
-                            Close
-                        </button>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }

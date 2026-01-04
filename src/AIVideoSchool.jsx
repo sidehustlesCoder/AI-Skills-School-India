@@ -40,6 +40,39 @@ export default function AIVideoSchool() {
     const openAuth = (view = 'signin') => setAuthModal({ isOpen: true, view });
     const closeAuth = () => setAuthModal({ ...authModal, isOpen: false });
 
+    const [contactForm, setContactForm] = useState({
+        name: '',
+        email: '',
+        subject: 'Course Inquiry',
+        message: ''
+    });
+    const [contactStatus, setContactStatus] = useState({ loading: false, success: false, message: '' });
+
+    const handleContactSubmit = async (e) => {
+        e.preventDefault();
+        setContactStatus({ loading: true, success: false, message: '' });
+
+        try {
+            const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+            const response = await fetch(`${baseUrl}/api/contact`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(contactForm),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setContactStatus({ loading: false, success: true, message: 'Message sent successfully! We will get back to you soon.' });
+                setContactForm({ name: '', email: '', subject: 'Course Inquiry', message: '' });
+            } else {
+                setContactStatus({ loading: false, success: false, message: data.error || 'Failed to send message.' });
+            }
+        } catch (error) {
+            setContactStatus({ loading: false, success: false, message: 'Failed to connect to server.' });
+        }
+    };
+
     const openEnroll = (item, type = 'plan') => {
         setEnrollModal({
             isOpen: true,
@@ -619,20 +652,38 @@ export default function AIVideoSchool() {
                             <p className="text-gray-400">Have questions? We're here to help you on your AI journey.</p>
                         </div>
                         <div className="max-w-3xl mx-auto bg-slate-800 p-8 rounded-2xl border border-orange-500/20">
-                            <form className="space-y-6">
+                            <form className="space-y-6" onSubmit={handleContactSubmit}>
                                 <div className="grid md:grid-cols-2 gap-6">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-400 mb-2">Full Name</label>
-                                        <input type="text" className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition" placeholder="Rahul Sharma" />
+                                        <input
+                                            type="text"
+                                            required
+                                            value={contactForm.name}
+                                            onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                                            placeholder="Rahul Sharma"
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-400 mb-2">Email Address</label>
-                                        <input type="email" className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition" placeholder="rahul@example.com" />
+                                        <input
+                                            type="email"
+                                            required
+                                            value={contactForm.email}
+                                            onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                                            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                                            placeholder="rahul@example.com"
+                                        />
                                     </div>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Subject</label>
-                                    <select className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition">
+                                    <select
+                                        value={contactForm.subject}
+                                        onChange={(e) => setContactForm({ ...contactForm, subject: e.target.value })}
+                                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                                    >
                                         <option>Course Inquiry</option>
                                         <option>Business Partnership</option>
                                         <option>Technical Support</option>
@@ -641,10 +692,26 @@ export default function AIVideoSchool() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-400 mb-2">Message</label>
-                                    <textarea rows="4" className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition" placeholder="How can we help you?"></textarea>
+                                    <textarea
+                                        rows="4"
+                                        required
+                                        value={contactForm.message}
+                                        onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                                        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500 transition"
+                                        placeholder="How can we help you?"
+                                    ></textarea>
                                 </div>
-                                <button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-lg shadow-lg shadow-orange-900/20 transition transform hover:-translate-y-1">
-                                    Send Message
+                                {contactStatus.message && (
+                                    <div className={`p-4 rounded-lg ${contactStatus.success ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                        {contactStatus.message}
+                                    </div>
+                                )}
+                                <button
+                                    type="submit"
+                                    disabled={contactStatus.loading}
+                                    className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-lg shadow-lg shadow-orange-900/20 transition transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {contactStatus.loading ? 'Sending...' : 'Send Message'}
                                 </button>
                             </form>
                         </div>

@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "node server/index.js",
-    "start": "node server/index.js",
+    "server": "node --env-file=.env server/index.js",
+    "start": "node --env-file=.env server/index.js",
     "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
     "build": "vite build",
     "lint": "eslint .",
@@ -17,6 +17,7 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "lucide-react": "^0.562.0",
+    "nodemailer": "^7.0.12",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "sqlite3": "^5.1.7"

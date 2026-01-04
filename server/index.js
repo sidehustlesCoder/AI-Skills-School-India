@@ -4,9 +4,19 @@ import express from 'express';
 import cors from 'cors';
 import db from './db.js';
 import bcrypt from 'bcryptjs';
+import nodemailer from 'nodemailer';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Email Transporter
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD || process.env.EMAIL_PASS
+    }
+});
 
 // Configure CORS for production
 app.use(cors({
@@ -46,6 +56,48 @@ app.get('/api/testimonials', (req, res) => {
         }
         res.json(rows);
     });
+});
+
+// Contact Endpoint
+app.post('/api/contact', async (req, res) => {
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !message) {
+        return res.status(400).json({ error: 'Name, email, and message are required' });
+    }
+
+    try {
+        // 1. Save to Database
+        const sql = 'INSERT INTO messages (name, email, subject, message) VALUES (?, ?, ?, ?)';
+        await new Promise((resolve, reject) => {
+            db.run(sql, [name, email, subject, message], function (err) {
+                if (err) reject(err);
+                else resolve(this.lastID);
+            });
+        });
+
+        // 2. Send Email
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: 'er.virgojai@gmail.com',
+            subject: `New Contact Form: ${subject || 'No Subject'}`,
+            text: `
+Name: ${name}
+Email: ${email}
+Subject: ${subject}
+
+Message:
+${message}
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.json({ success: true, message: 'Message sent successfully' });
+    } catch (error) {
+        console.error('Contact error:', error);
+        res.status(500).json({ error: 'Failed to send message' });
+    }
 });
 
 // Get user reviews (Dynamic)

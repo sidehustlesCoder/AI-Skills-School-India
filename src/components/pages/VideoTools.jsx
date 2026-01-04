@@ -31,6 +31,7 @@ const ToolGuide = ({ title, icon, summary, children }) => {
     );
 };
 
+// eslint-disable-next-line no-unused-vars
 const SectionHeader = ({ icon: Icon, title }) => (
     <h4 className="flex items-center gap-2 text-green-400 mt-8 mb-4">
         <Icon className="w-5 h-5" />

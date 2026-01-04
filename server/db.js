@@ -146,11 +146,7 @@ function seedData() {
     stats.forEach(s => stmtStats.run(s));
     stmtStats.finalize();
 
-    const pricingPlans = [
-        ["Starter", "999", "1,999", "month", false],
-        ["Pro", "1,999", "4,999", "month", true],
-        ["Enterprise", "4,999", "9,999", "month", false]
-    ];
+
 
     // Clear plans and features
     db.run("DELETE FROM plan_features");

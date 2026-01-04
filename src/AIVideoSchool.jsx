@@ -23,6 +23,7 @@ export default function AIVideoSchool() {
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [policyModal, setPolicyModal] = useState({ show: false, title: '', content: '' });
 
+
     // Data States
     const [courses, setCourses] = useState([]);
     const [features, setFeatures] = useState([]);
@@ -31,7 +32,10 @@ export default function AIVideoSchool() {
     const [pricingPlans, setPricingPlans] = useState([]);
     const [stats, setStats] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(() => {
+        const savedUser = localStorage.getItem('ai_school_user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
 
     const openAuth = (view = 'signin') => setAuthModal({ isOpen: true, view });
     const closeAuth = () => setAuthModal({ ...authModal, isOpen: false });
@@ -82,12 +86,6 @@ export default function AIVideoSchool() {
                 setLoading(false);
             }
         };
-
-        // Check for existing session
-        const savedUser = localStorage.getItem('ai_school_user');
-        if (savedUser) {
-            setUser(JSON.parse(savedUser));
-        }
 
         fetchData();
     }, []);

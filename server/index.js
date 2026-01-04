@@ -1,4 +1,5 @@
 // server/index.js
+/* global process */
 import express from 'express';
 import cors from 'cors';
 import db from './db.js';

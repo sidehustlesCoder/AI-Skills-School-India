@@ -36,7 +36,7 @@ export default function AuthModal({ isOpen, onClose, initialView = 'signin', onL
             } else {
                 setError(data.error || 'Something went wrong');
             }
-        } catch (err) {
+        } catch {
             setError('Failed to connect to server');
         } finally {
             setLoading(false);
